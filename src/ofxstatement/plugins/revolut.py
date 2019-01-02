@@ -1,5 +1,6 @@
 import csv
 import re
+import datetime
 
 from currency_converter import CurrencyConverter
 
@@ -26,6 +27,7 @@ TRANSACTION_TYPES = {
 class RevolutCSVStatementParser(CsvStatementParser):
 
     date_format = "%d %B %Y"
+    date_formats = ["%d %B %Y", "%Y %B %d", "{} %B %d".format(datetime.datetime.now().year)]
     ccnv = CurrencyConverter(fallback_on_wrong_date=True)
 
     def __init__(self, f, ccy):
@@ -56,6 +58,16 @@ class RevolutCSVStatementParser(CsvStatementParser):
             return 0
 
         return self.parse_float(value.strip().replace('.', '').replace(',', '.'))
+
+    def parse_datetime(self, value):
+        for date_format in self.date_formats:
+            try:
+                self.date_format = date_format
+                parsed = super().parse_datetime(value)
+                return parsed
+            except Exception:
+                pass
+        raise Exception("Could not convert date")
 
     def parse_record(self, line):
         # Free Headerline
