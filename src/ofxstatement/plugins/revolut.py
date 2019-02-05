@@ -69,7 +69,7 @@ class RevolutCSVStatementParser(CsvStatementParser):
                 return parsed
             except Exception:
                 pass
-        raise Exception("Could not convert date %s" % value)
+        raise Exception("Could not convert date {}. Tried: {}".format(value, self.date_formats))
 
     def parse_record(self, line):
         # Free Headerline
