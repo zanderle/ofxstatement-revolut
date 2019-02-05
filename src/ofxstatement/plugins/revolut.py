@@ -27,7 +27,7 @@ TRANSACTION_TYPES = {
 class RevolutCSVStatementParser(CsvStatementParser):
 
     date_format = "%d %B %Y"
-    date_formats = ["%d %B %Y", "%Y %B %d", "{} %B %d".format(datetime.datetime.now().year)]
+    date_formats = ["%d %B %Y", "%Y %B %d", "%B %d"]
     ccnv = CurrencyConverter(fallback_on_wrong_date=True)
 
     def __init__(self, f, ccy):
@@ -64,6 +64,8 @@ class RevolutCSVStatementParser(CsvStatementParser):
             try:
                 self.date_format = date_format
                 parsed = super().parse_datetime(value)
+                if parsed.year == 1900:
+                    parsed.year = datetime.datetime.now().year
                 return parsed
             except Exception:
                 pass
